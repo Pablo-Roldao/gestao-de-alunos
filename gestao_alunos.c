@@ -98,8 +98,9 @@ void listarAlunos(turma *t) {
         for (int j = 0; j < 7; j++) {
             printf("\tDisciplina %d: %d\n", j + 1, t->alunos[i].faltas[j]);
         }
-
+        
         printf("\n\n");
+    
     }
 }
 
@@ -175,4 +176,67 @@ int tamanhoTurma(turma *t) {
 
 void liberarMemoria(turma *t) {
     free(t->alunos);
+}
+
+int salvarDadosEmArquivo(const char *nomeArquivo, turma *t) {
+    FILE *arquivo = fopen(nomeArquivo, "w");
+
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo para escrita.\n");
+        return 0;
+    }
+
+    for (int i = 0; i < t->qtdAlunos; i++) {
+        fprintf(arquivo, "%d;%s;%d;", t->alunos[i].matricula, t->alunos[i].nome, t->alunos[i].codTurma);
+
+        for (int j = 0; j < 7; j++) {
+            fprintf(arquivo, "%.2f;", t->alunos[i].notas[j]);
+        }
+
+        for (int j = 0; j < 7; j++) {
+            fprintf(arquivo, "%d;", t->alunos[i].faltas[j]);
+        }
+
+        fprintf(arquivo, "\n");
+    }
+
+    fclose(arquivo);
+    return 1;
+}
+
+int carregarDadosDoArquivo(const char *nomeArquivo, turma *t) {
+    FILE *arquivo = fopen(nomeArquivo, "r");
+
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo para leitura.\n");
+        return 0;
+    }
+
+    while (fscanf(arquivo, "%d;%49[^;];%d;", &t->alunos[t->qtdAlunos].matricula,
+                  t->alunos[t->qtdAlunos].nome, &t->alunos[t->qtdAlunos].codTurma) == 3) {
+
+        for (int j = 0; j < 7; j++) {
+            fscanf(arquivo, "%f;", &t->alunos[t->qtdAlunos].notas[j]);
+        }
+
+        for (int j = 0; j < 7; j++) {
+            fscanf(arquivo, "%d;", &t->alunos[t->qtdAlunos].faltas[j]);
+        }
+
+        t->qtdAlunos++;
+
+        if (t->qtdAlunos == t->capacidade) {
+            t->capacidade += 10;
+            t->alunos = realloc(t->alunos, t->capacidade * sizeof(aluno));
+
+            if (t->alunos == NULL) {
+                printf("Erro ao realocar memória.\n");
+                fclose(arquivo);
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+
+    fclose(arquivo);
+    return 1;
 }

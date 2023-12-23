@@ -5,6 +5,10 @@ int main() {
     turma minhaTurma;
     inicializarTurma(&minhaTurma);
 
+    if (!carregarDadosDoArquivo("alunos.txt", &minhaTurma)) {
+        printf("Não foi possível carregar os dados do arquivo. Inicializando com turma vazia.\n");
+    }
+
     printf("---------SISTEMA DE GESTÃO DE ALUNOS---------\n\n");
 
     int opcao;
@@ -34,8 +38,10 @@ int main() {
             default:
                 printf("\nOpção inválida. Tente novamente.\n\n");
         }
+
     } while (opcao != -1);
 
+    salvarDadosEmArquivo("alunos.txt", &minhaTurma);
     liberarMemoria(&minhaTurma);
 
     return 0;

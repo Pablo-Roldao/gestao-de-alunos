@@ -23,5 +23,7 @@ void removerAluno(turma *t);
 void procurarAluno(turma *t);
 int tamanhoTurma(turma *t);
 void liberarMemoria(turma *t);
+int salvarDadosEmArquivo(const char *nomeArquivo, turma *t);
+int carregarDadosDoArquivo(const char *nomeArquivo, turma *t);
 
 #endif
